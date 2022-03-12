@@ -1,4 +1,4 @@
 # GuniAppProject
 Project for final submission at eInfochips
 
-It uses GuniThesisWebApp
+It uses GuniThesisWebApp database
