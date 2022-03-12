@@ -1,4 +1,5 @@
 using GuniThesisApp.Web.Data;
+using GuniThesisApp.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,8 +32,42 @@ namespace GuniThesisApp.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            // Configure the ASP.NET Identity
+            services
+                .AddIdentity<MyIdentityUser, MyIdentityRole>(options =>
+                {
+                     //Sign_In Policy
+                     options.SignIn.RequireConfirmedAccount = true;
+
+                     // Password Policy
+                     options.Password.RequireUppercase = true;
+                     options.Password.RequireLowercase = true;
+                     options.Password.RequireDigit = true;
+                     options.Password.RequireNonAlphanumeric = true;
+                     options.Password.RequiredLength = 8;
+
+                     // User Policy
+                     options.User.RequireUniqueEmail = true;
+                })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Configure the Identity Application Level Cookie
+            services
+                .ConfigureApplicationCookie(options =>
+                {
+                    options.LoginPath = "/Identity/Account/Login";
+                    options.LogoutPath = "/Identity/Account/Logout";
+                    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+                    options.SlidingExpiration = true;
+                });
+
             services.AddRazorPages();
         }
 
